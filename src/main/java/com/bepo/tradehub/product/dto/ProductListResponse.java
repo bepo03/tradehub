@@ -24,7 +24,7 @@ public class ProductListResponse {
     private String status;
     private LocalDateTime createdAt;
 
-    public static ProductListResponse toResponseList(Product product) {
+    public static ProductListResponse from(Product product) {
         return ProductListResponse.builder()
                 .id(product.getId())
                 .title(product.getTitle())

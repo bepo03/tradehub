@@ -26,14 +26,14 @@ public class ProductService {
 
         Product saveProduct = productRepository.save(product);
 
-        return ProductResponse.toResponse(saveProduct);
+        return ProductResponse.from(saveProduct);
     }
 
     @Transactional(readOnly = true)
     public List<ProductListResponse> getProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream()
-                .map(ProductListResponse::toResponseList)
+                .map(ProductListResponse::from)
                 .toList();
     }
 
@@ -44,7 +44,7 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + productId));
 
-        return ProductResponse.toResponse(product);
+        return ProductResponse.from(product);
     }
 
     @Transactional
@@ -59,7 +59,7 @@ public class ProductService {
 
         Product updateProduct = productRepository.save(product);
 
-        return ProductResponse.toResponse(updateProduct);
+        return ProductResponse.from(updateProduct);
     }
 
     @Transactional
