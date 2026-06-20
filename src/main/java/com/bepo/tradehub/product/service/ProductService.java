@@ -5,6 +5,7 @@ import com.bepo.tradehub.product.dto.ProductListResponse;
 import com.bepo.tradehub.product.dto.ProductResponse;
 import com.bepo.tradehub.product.dto.ProductUpdateRequest;
 import com.bepo.tradehub.product.entity.Product;
+import com.bepo.tradehub.product.exception.ProductNotFoundException;
 import com.bepo.tradehub.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class ProductService {
             Long productId
     ) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + productId));
+                .orElseThrow(() -> new ProductNotFoundException(productId));
 
         return ProductResponse.from(product);
     }
@@ -53,7 +54,7 @@ public class ProductService {
             Long productId
     ) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + productId));
+                .orElseThrow(() -> new ProductNotFoundException(productId));
 
         product.updateEntity(request);
 
@@ -67,7 +68,7 @@ public class ProductService {
             Long productId
     ) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + productId));
+                .orElseThrow(() -> new ProductNotFoundException(productId));
 
         productRepository.delete(product);
     }

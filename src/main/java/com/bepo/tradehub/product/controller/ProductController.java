@@ -1,5 +1,6 @@
 package com.bepo.tradehub.product.controller;
 
+import com.bepo.tradehub.global.common.ApiResponse;
 import com.bepo.tradehub.product.dto.ProductCreateRequest;
 import com.bepo.tradehub.product.dto.ProductListResponse;
 import com.bepo.tradehub.product.dto.ProductResponse;
@@ -28,39 +29,40 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(
+    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
             @RequestBody @Valid ProductCreateRequest request
     ) {
         ProductResponse response = productService.createProduct(request);
 
-        return ResponseEntity.created(URI.create("/api/products/" + response.getId()))
-                .body(response);
+        return ResponseEntity
+                .created(URI.create("/api/products/" + response.getId()))
+                .body(ApiResponse.success(response));
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductListResponse>> getProducts() {
+    public ResponseEntity<ApiResponse<List<ProductListResponse>>> getProducts() {
         List<ProductListResponse> responses = productService.getProducts();
 
-        return ResponseEntity.ok(responses);
+        return ResponseEntity.ok(ApiResponse.success(responses));
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductResponse> getProduct(
+    public ResponseEntity<ApiResponse<ProductResponse>> getProduct(
             @PathVariable Long productId
     ) {
         ProductResponse response = productService.getProduct(productId);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<ProductResponse> updateProduct(
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
             @RequestBody @Valid ProductUpdateRequest request,
             @PathVariable Long productId
     ) {
         ProductResponse response = productService.updateProduct(request, productId);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @DeleteMapping("/{productId}")
