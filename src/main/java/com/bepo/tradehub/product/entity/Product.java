@@ -1,14 +1,18 @@
 package com.bepo.tradehub.product.entity;
 
+import com.bepo.tradehub.category.entity.Category;
 import com.bepo.tradehub.product.dto.ProductCreateRequest;
 import com.bepo.tradehub.product.dto.ProductUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +33,10 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
     @Column(nullable = false, length = 100)
     private String title;
 
@@ -47,8 +55,9 @@ public class Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public static Product toEntity(ProductCreateRequest request) {
+    public static Product toEntity(ProductCreateRequest request, Category category) {
         return Product.builder()
+                .category(category)
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .price(request.getPrice())
@@ -58,7 +67,8 @@ public class Product {
                 .build();
     }
 
-    public void updateEntity(ProductUpdateRequest request) {
+    public void updateEntity(ProductUpdateRequest request, Category category) {
+        this.category = category;
         this.title = request.getTitle();
         this.description = request.getDescription();
         this.price = request.getPrice();

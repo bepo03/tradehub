@@ -1,5 +1,8 @@
 package com.bepo.tradehub.product.service;
 
+import com.bepo.tradehub.category.entity.Category;
+import com.bepo.tradehub.category.exception.CategoryNotFoundException;
+import com.bepo.tradehub.category.repository.CategoryRepository;
 import com.bepo.tradehub.product.dto.ProductCreateRequest;
 import com.bepo.tradehub.product.dto.ProductListResponse;
 import com.bepo.tradehub.product.dto.ProductResponse;
@@ -18,12 +21,16 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     @Transactional
     public ProductResponse createProduct(
             ProductCreateRequest request
     ) {
-        Product product = Product.toEntity(request);
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(request.getCategoryId()));
+
+        Product product = Product.toEntity(request, category);
 
         Product saveProduct = productRepository.save(product);
 
@@ -56,7 +63,10 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
 
-        product.updateEntity(request);
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(request.getCategoryId()));
+
+        product.updateEntity(request, category);
 
         Product updateProduct = productRepository.save(product);
 
