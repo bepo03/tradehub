@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @JsonPropertyOrder({
-        "id", "title", "price", "status", "createdAt"
+        "id", "title", "price", "status", "category", "createdAt"
 })
 public class ProductListResponse {
 
@@ -22,6 +22,7 @@ public class ProductListResponse {
     private String title;
     private Long price;
     private String status;
+    private ProductCategoryResponse category;
     private LocalDateTime createdAt;
 
     public static ProductListResponse from(Product product) {
@@ -30,6 +31,7 @@ public class ProductListResponse {
                 .title(product.getTitle())
                 .price(product.getPrice())
                 .status(product.getStatus().toString())
+                .category(ProductCategoryResponse.from(product.getCategory()))
                 .createdAt(product.getCreatedAt())
                 .build();
     }

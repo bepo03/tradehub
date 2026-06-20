@@ -15,6 +15,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProductCreateRequest {
 
+    @NotNull(message = "카테고리는 필수입니다.")
+    private Long categoryId;
+
     @NotBlank(message = "상품명은 필수입니다.")
     @Size(max = 100, message = "상품명은 100자 이하로 입력해주세요.")
     private String title;
