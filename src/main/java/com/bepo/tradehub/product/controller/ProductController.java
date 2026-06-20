@@ -1,16 +1,22 @@
 package com.bepo.tradehub.product.controller;
 
 import com.bepo.tradehub.global.common.ApiResponse;
+import com.bepo.tradehub.global.common.PageResponse;
 import com.bepo.tradehub.product.dto.ProductCreateRequest;
 import com.bepo.tradehub.product.dto.ProductListResponse;
 import com.bepo.tradehub.product.dto.ProductResponse;
+import com.bepo.tradehub.product.dto.ProductSearchCondition;
 import com.bepo.tradehub.product.dto.ProductUpdateRequest;
 import com.bepo.tradehub.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -40,8 +45,12 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ProductListResponse>>> getProducts() {
-        List<ProductListResponse> responses = productService.getProducts();
+    public ResponseEntity<ApiResponse<PageResponse<ProductListResponse>>> getProducts(
+            @ModelAttribute ProductSearchCondition condition,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        PageResponse<ProductListResponse> responses = productService.getProducts(condition, pageable);
 
         return ResponseEntity.ok(ApiResponse.success(responses));
     }

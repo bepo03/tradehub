@@ -3,20 +3,22 @@ package com.bepo.tradehub.product.service;
 import com.bepo.tradehub.category.entity.Category;
 import com.bepo.tradehub.category.exception.CategoryNotFoundException;
 import com.bepo.tradehub.category.repository.CategoryRepository;
+import com.bepo.tradehub.global.common.PageResponse;
 import com.bepo.tradehub.product.dto.ProductCreateRequest;
 import com.bepo.tradehub.product.dto.ProductListResponse;
 import com.bepo.tradehub.product.dto.ProductResponse;
+import com.bepo.tradehub.product.dto.ProductSearchCondition;
 import com.bepo.tradehub.product.dto.ProductUpdateRequest;
 import com.bepo.tradehub.product.entity.Product;
 import com.bepo.tradehub.product.exception.ProductInUseException;
 import com.bepo.tradehub.product.exception.ProductNotFoundException;
 import com.bepo.tradehub.product.repository.ProductRepository;
+import com.bepo.tradehub.product.repository.ProductSpecification;
 import com.bepo.tradehub.reservation.repository.TradeReservationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,11 +43,16 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductListResponse> getProducts() {
-        List<Product> products = productRepository.findAll();
-        return products.stream()
-                .map(ProductListResponse::from)
-                .toList();
+    public PageResponse<ProductListResponse> getProducts(
+            ProductSearchCondition condition,
+            Pageable pageable
+    ) {
+        return PageResponse.from(
+                productRepository.findAll(
+                        ProductSpecification.byCondition(condition),
+                        pageable
+                ).map(ProductListResponse::from)
+        );
     }
 
     @Transactional(readOnly = true)
