@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
-        log.error("Unexcepted exception occurred: ", e);
+        log.error("Unexpected exception occurred", e);
 
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         ErrorResponse response = ErrorResponse.from(errorCode);

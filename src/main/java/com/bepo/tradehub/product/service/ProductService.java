@@ -8,8 +8,10 @@ import com.bepo.tradehub.product.dto.ProductListResponse;
 import com.bepo.tradehub.product.dto.ProductResponse;
 import com.bepo.tradehub.product.dto.ProductUpdateRequest;
 import com.bepo.tradehub.product.entity.Product;
+import com.bepo.tradehub.product.exception.ProductInUseException;
 import com.bepo.tradehub.product.exception.ProductNotFoundException;
 import com.bepo.tradehub.product.repository.ProductRepository;
+import com.bepo.tradehub.reservation.repository.TradeReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final TradeReservationRepository tradeReservationRepository;
 
     @Transactional
     public ProductResponse createProduct(
@@ -79,6 +82,10 @@ public class ProductService {
     ) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
+
+        if (tradeReservationRepository.existsByProductId(productId)) {
+            throw new ProductInUseException(productId);
+        }
 
         productRepository.delete(product);
     }
