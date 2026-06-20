@@ -5,8 +5,10 @@ import com.bepo.tradehub.category.dto.CategoryListResponse;
 import com.bepo.tradehub.category.dto.CategoryResponse;
 import com.bepo.tradehub.category.dto.CategoryUpdateRequest;
 import com.bepo.tradehub.category.entity.Category;
+import com.bepo.tradehub.category.exception.CategoryInUseException;
 import com.bepo.tradehub.category.exception.CategoryNotFoundException;
 import com.bepo.tradehub.category.repository.CategoryRepository;
+import com.bepo.tradehub.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
     @Transactional
     public CategoryResponse createCategory(
@@ -70,6 +73,10 @@ public class CategoryService {
     ) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+
+        if (productRepository.existsByCategoryId(categoryId)) {
+            throw new CategoryInUseException(categoryId);
+        }
 
         categoryRepository.delete(category);
     }
