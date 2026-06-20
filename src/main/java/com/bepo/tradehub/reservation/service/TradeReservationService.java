@@ -29,6 +29,8 @@ public class TradeReservationService {
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException(request.getProductId()));
 
+        product.validateReservable();
+
         TradeReservation tradeReservation = TradeReservation.toEntity(request, product);
 
         TradeReservation saveReservation = tradeReservationRepository.save(tradeReservation);
@@ -49,6 +51,46 @@ public class TradeReservationService {
     public TradeReservationResponse getReservation(Long reservationId) {
         TradeReservation tradeReservation = tradeReservationRepository.findById(reservationId)
                 .orElseThrow(() -> new TradeReservationNotFoundException(reservationId));
+
+        return TradeReservationResponse.from(tradeReservation);
+    }
+
+    @Transactional
+    public TradeReservationResponse acceptReservation(Long reservationId) {
+        TradeReservation tradeReservation = tradeReservationRepository.findById(reservationId)
+                .orElseThrow(() -> new TradeReservationNotFoundException(reservationId));
+
+        tradeReservation.accept();
+
+        return TradeReservationResponse.from(tradeReservation);
+    }
+
+    @Transactional
+    public TradeReservationResponse rejectReservation(Long reservationId) {
+        TradeReservation tradeReservation = tradeReservationRepository.findById(reservationId)
+                .orElseThrow(() -> new TradeReservationNotFoundException(reservationId));
+
+        tradeReservation.reject();
+
+        return TradeReservationResponse.from(tradeReservation);
+    }
+
+    @Transactional
+    public TradeReservationResponse cancelReservation(Long reservationId) {
+        TradeReservation tradeReservation = tradeReservationRepository.findById(reservationId)
+                .orElseThrow(() -> new TradeReservationNotFoundException(reservationId));
+
+        tradeReservation.cancel();
+
+        return TradeReservationResponse.from(tradeReservation);
+    }
+
+    @Transactional
+    public TradeReservationResponse completeReservation(Long reservationId) {
+        TradeReservation tradeReservation = tradeReservationRepository.findById(reservationId)
+                .orElseThrow(() -> new TradeReservationNotFoundException(reservationId));
+
+        tradeReservation.complete();
 
         return TradeReservationResponse.from(tradeReservation);
     }

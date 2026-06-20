@@ -3,6 +3,7 @@ package com.bepo.tradehub.product.entity;
 import com.bepo.tradehub.category.entity.Category;
 import com.bepo.tradehub.product.dto.ProductCreateRequest;
 import com.bepo.tradehub.product.dto.ProductUpdateRequest;
+import com.bepo.tradehub.product.exception.ProductNotReservableException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -72,6 +73,29 @@ public class Product {
         this.title = request.getTitle();
         this.description = request.getDescription();
         this.price = request.getPrice();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void validateReservable() {
+        if (this.status != ProductStatus.SELLING) {
+            throw new ProductNotReservableException(this.id, this.status);
+        }
+    }
+
+    public void reserve() {
+        validateReservable();
+
+        this.status = ProductStatus.RESERVED;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void sell() {
+        this.status = ProductStatus.SELLING;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void soldOut() {
+        this.status = ProductStatus.SOLD_OUT;
         this.updatedAt = LocalDateTime.now();
     }
 }

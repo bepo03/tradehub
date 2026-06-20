@@ -3,6 +3,7 @@ package com.bepo.tradehub.reservation.entity;
 
 import com.bepo.tradehub.product.entity.Product;
 import com.bepo.tradehub.reservation.dto.TradeReservationCreateRequest;
+import com.bepo.tradehub.reservation.exception.InvalidReservationStatusException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -65,5 +66,63 @@ public class TradeReservation {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+    }
+
+    public void accept() {
+        if (this.status != TradeReservationStatus.REQUESTED) {
+            throw new InvalidReservationStatusException(
+                    this.id,
+                    this.status,
+                    "수락"
+            );
+        }
+
+        this.status = TradeReservationStatus.ACCEPTED;
+        this.product.reserve();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void reject() {
+        if (this.status != TradeReservationStatus.REQUESTED) {
+            throw new InvalidReservationStatusException(
+                    this.id,
+                    this.status,
+                    "거절"
+            );
+        }
+
+        this.status = TradeReservationStatus.REJECTED;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void cancel() {
+        if (this.status == TradeReservationStatus.REQUESTED) {
+            this.status = TradeReservationStatus.CANCELED;
+            this.updatedAt = LocalDateTime.now();
+        } else if (this.status == TradeReservationStatus.ACCEPTED) {
+            this.status = TradeReservationStatus.CANCELED;
+            this.product.sell();
+            this.updatedAt = LocalDateTime.now();
+        } else {
+            throw new InvalidReservationStatusException(
+                    this.id,
+                    this.status,
+                    "취소"
+            );
+        }
+    }
+
+    public void complete() {
+        if (this.status != TradeReservationStatus.ACCEPTED) {
+            throw new InvalidReservationStatusException(
+                    this.id,
+                    this.status,
+                    "거래 완료"
+            );
+        }
+
+        this.status = TradeReservationStatus.COMPLETED;
+        this.product.soldOut();
+        this.updatedAt = LocalDateTime.now();
     }
 }
